@@ -4,7 +4,7 @@
 #include <vector>
 #include <iostream>
 
-#include <hiredis.h>
+#include <hiredis/hiredis.h>
 #include <unistd.h>
 
 #define VERSION "1.0.0"
@@ -29,17 +29,17 @@ static bool reply_parse(char* src, std::size_t len, std::vector<const char *> &a
   char trans[5][3];
   memset(trans, Error, sizeof(trans));
   trans[Begin][Quotation] = Copy;
-  trans[Begin][Others] = Begin;
+  trans[Begin][Othersit] = Begin;
   trans[Wait][Quotation] = Copy;
-  trans[Wait][Others] = Wait;
+  trans[Wait][Othersit] = Wait;
   trans[Copy][Quotation] = Wait;
-  trans[Copy][Others] = Copy;
+  trans[Copy][Othersit] = Copy;
   trans[Copy][Backslash] = Escape;
   trans[Escape][Quotation] = Copy;
   trans[Escape][Backslash] = Copy;
-  trans[Escape][Others] = Copy;
+  trans[Escape][Othersit] = Copy;
 
-  int i = 0, cur_status = Begin, input = Others;
+  int i = 0, cur_status = Begin, input = Othersit;
   std::string des;
   while (i < (int)len) {
     if (cur_status == Copy || cur_status == Escape)  des.push_back(src[i]);
@@ -51,7 +51,7 @@ static bool reply_parse(char* src, std::size_t len, std::vector<const char *> &a
         input = Backslash;
         break;
       default:
-        input = Others;
+        input = Othersit;
     }
     cur_status = trans[cur_status][input];
 
